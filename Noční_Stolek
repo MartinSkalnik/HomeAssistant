@@ -1,0 +1,32 @@
+alias: Rozsvítí noční stolek
+description: Rozsvítí noční stolek pří vstávání
+trigger:
+  - platform: time
+    at: '06:20'
+condition:
+  - condition: time
+    weekday:
+      - mon
+      - tue
+      - wed
+      - thu
+      - fri
+  - condition: sun
+    before: sunrise
+    after: sunrise
+    after_offset: '00:05:00'
+action:
+  - type: turn_on
+    device_id: f63532265571328430ee34ab6fb957d5
+    entity_id: switch.light_1
+    domain: switch
+  - delay:
+      hours: 0
+      minutes: 2
+      seconds: 0
+      milliseconds: 0
+  - type: turn_off
+    device_id: f63532265571328430ee34ab6fb957d5
+    entity_id: switch.light_1
+    domain: switch
+mode: single
