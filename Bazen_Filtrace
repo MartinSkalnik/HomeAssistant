@@ -1,4 +1,4 @@
-alias: Fitrace Bazénu
+alias: Filtrace Bazénu
 description: Spouští filtraci bazénu
 trigger:
   - platform: time
