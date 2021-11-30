@@ -1,0 +1,33 @@
+alias: Fitrace Bazénu
+description: Spouští filtraci bazénu
+trigger:
+  - platform: time
+    at: '06:00'
+  - platform: time
+    at: '12:00'
+  - platform: time
+    at: '19:00'
+condition: []
+action:
+  - type: turn_on
+    device_id: 4bbd9703b3120e38e9a9c12bf7d1f642
+    entity_id: switch.filtrace
+    domain: switch
+  - service: notify.mobile_app_martin_mobil
+    data:
+      message: Filtrace bazénu zahájena !
+      title: Info Bazén
+  - delay:
+      hours: 3
+      minutes: 0
+      seconds: 0
+      milliseconds: 0
+  - type: turn_off
+    device_id: 4bbd9703b3120e38e9a9c12bf7d1f642
+    entity_id: switch.filtrace
+    domain: switch
+  - service: notify.mobile_app_martin_mobil
+    data:
+      title: Info Bazén
+      message: Filtrace bazénu ukončena !
+mode: single
