@@ -11,10 +11,6 @@ condition:
       - wed
       - thu
       - fri
-  - condition: sun
-    before: sunrise
-    after: sunrise
-    after_offset: '00:05:00'
 action:
   - type: turn_on
     device_id: f63532265571328430ee34ab6fb957d5
