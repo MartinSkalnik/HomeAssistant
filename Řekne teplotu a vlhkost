@@ -1,0 +1,31 @@
+alias: Teplota v obýváku
+description: Řekne teplotu a vlhkost
+trigger:
+  - platform: time
+    at: '06:45'
+condition:
+  - condition: time
+    weekday:
+      - mon
+      - tue
+      - wed
+      - thu
+      - fri
+action:
+  - service: media_player.volume_set
+    target:
+      device_id:
+        - 43c4b86d5939a3b6a52fd46a2a65a701
+    data:
+      volume_level: 0.75
+  - service: tts.google_say
+    data:
+      entity_id: media_player.livingroom
+      message: >-
+        Teplota v místnosti je
+        {{states('sensor.ble_temperature_teplomer_obyvak')}} stupňů Celsia a
+        vlhkost vzduchu je {{states('sensor.ble_humidity_teplomer_obyvak')}}
+        procent.
+      language: cs
+      cache: false
+mode: single
