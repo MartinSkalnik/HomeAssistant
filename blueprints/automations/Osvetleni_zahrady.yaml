@@ -1,0 +1,23 @@
+blueprint:
+  alias: Osvětlení zahrady v noci
+  description: Zapíná světla okolo bazénu
+  domain: automation
+  trigger:
+    - platform: sun
+      event: sunset
+      offset: '-00:05:00'
+  action:
+    - type: turn_on
+      device_id: 4bbd9703b3120e38e9a9c12bf7d1f642
+      entity_id: switch.svetlo_zahrada
+      domain: switch
+    - delay:
+        hours: 1
+        minutes: 0
+        seconds: 0
+        milliseconds: 0
+    - type: turn_off
+      device_id: 4bbd9703b3120e38e9a9c12bf7d1f642
+      entity_id: switch.svetlo_zahrada
+      domain: switch
+  initial_state: 'on'
