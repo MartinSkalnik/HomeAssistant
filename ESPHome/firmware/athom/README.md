@@ -1,9 +1,8 @@
-# Athom ESPHome configurations
+# Athom ESPHome konfigurace
 
-This repository contains a bunch of ESPHome configurations for https://athom.tech devices.
+Tento repozitář obsahuje konfigurace pro ESPHome do https://athom.tech zařízení.
 
-If you are prompted that there is not enough space, you should upgrade `ESP8266_MINI.bin` first
-
+Pokud zařízení hlásí nedostatek volného místa, musí se nejdíve nahrát `ESP8266_MINI.bin`.
 - mini is a transit firmware, after running, it will generate a hotspot of "ESP_UPDATE_XXXXXX"
 - Connect to the hotspot and visit `http://192.168.4.1/update` in the browser
 - Upload updated ESPHome firmware
@@ -15,7 +14,7 @@ If you are prompted that there is not enough space, you should upgrade `ESP8266_
 
 # Migrating from Tasmota
 
-- First execute `SetOption78 1` in the console of Tasmota
+- Prvně zadat v konzoli Tasmoty příkaz `SetOption78 1`.
 - Select firmware upgrade, upload `tasmota-minimal.bin` and click start upgrade
 - Select the firmware upgrade again, upload the firmware of ESPHome and click to start upgrade
 - Download ESPHome firmware here https://github.com/tarontop/athom-configs/actions
