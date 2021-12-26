@@ -1,0 +1,76 @@
+substitutions:
+  name: "athom-ws2812b"
+  friendly_name: "Athom WS2812B"
+  project_name: "athom.ws2812b"
+  project_version: "1.0"
+  button_toggle: "true"
+
+esphome:
+  name: "${name}"
+  name_add_mac_suffix: true
+  platform: ESP8266
+  board: esp01_1m
+  project:
+    name: "${project_name}"
+    version: "${project_version}"
+
+api:
+
+ota:
+
+logger:
+
+web_server:
+  port: 80
+
+wifi:
+  ap: {} # This spawns an AP with the device name and mac address with no password.
+
+captive_portal:
+
+dashboard_import:
+  package_import_url: github://athom-tech/athom-configs/athom-ws2812b.yaml
+
+binary_sensor:
+  - platform: status
+    name: "${friendly_name} Status"
+
+  - platform: gpio
+    name: "${friendly_name} Button"
+    id: button
+    pin:
+      number: GPIO0
+      inverted: true
+    on_click:
+      - if:
+          condition:
+            lambda: "return ${button_toggle} == true;"
+          then:
+            - light.toggle: leds
+
+sensor:
+  - platform: uptime
+    name: "${friendly_name} Uptime Sensor"
+
+switch:
+  - platform: restart
+    id: restart_switch
+    name: "${friendly_name} Restart"
+
+light:
+  - platform: fastled_clockless
+    pin: GPIO2
+    id: leds
+    name: "${friendly_name}"
+    chipset: WS2811
+    num_leds: 150
+    rgb_order: GRB
+    effects:
+      - addressable_rainbow:
+      - addressable_scan:
+
+text_sensor:
+  - platform: wifi_info
+    ip_address:
+      name: "${friendly_name} IP Address"
+      disabled_by_default: true

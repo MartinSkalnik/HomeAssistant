@@ -1,0 +1,110 @@
+substitutions:
+  name: "athom-garage-door"
+  friendly_name: "Athom Garage Door"
+  project_name: "athom.garage-door"
+  project_version: "1.0"
+
+esphome:
+  name: "${name}"
+  name_add_mac_suffix: true
+  platform: ESP8266
+  board: esp8285
+  project:
+    name: "${project_name}"
+    version: "${project_version}"
+
+api:
+
+ota:
+
+logger:
+
+web_server:
+  port: 80
+
+wifi:
+  ap: {} # This spawns an AP with the device name and mac address with no password.
+
+captive_portal:
+
+dashboard_import:
+  package_import_url: github://athom-tech/athom-configs/athom-garage-door.yaml
+
+sensor:
+  - platform: uptime
+    name: "${friendly_name} Uptime Sensor"
+    disabled_by_default: true
+
+binary_sensor:
+  - platform: status
+    name: "${friendly_name} Status"
+
+  - platform: gpio
+    name: "${friendly_name} Contact"
+    disabled_by_default: true
+    device_class: garage_door
+    id: contact
+    pin:
+      number: GPIO4
+      inverted: true
+    filters:
+      - delayed_on: 20ms
+
+  - platform: gpio
+    pin:
+      number: GPIO14
+      mode: INPUT_PULLUP
+      inverted: true
+    name: "${friendly_name} Button"
+    disabled_by_default: true
+    on_multi_click:
+      - timing:
+          - ON for at most 1s
+          - OFF for at least 0.2s
+        then:
+          switch.turn_on: relay
+      - timing:
+          - ON for at least 4s
+        then:
+          switch.turn_on: restart_switch
+
+switch:
+  - platform: restart
+    id: restart_switch
+    name: "${friendly_name} Restart"
+
+  - platform: gpio
+    pin: GPIO5
+    name: "${friendly_name} Relay"
+    id: relay
+    disabled_by_default: true
+    on_turn_on:
+      - light.turn_on: wifi_led
+      - delay: 1s
+      - switch.turn_off: relay
+      - light.turn_off: wifi_led
+
+light:
+  - platform: status_led
+    name: "${friendly_name} WiFi LED"
+    id: wifi_led
+    disabled_by_default: true
+    pin: GPIO12
+
+cover:
+  - platform: template
+    device_class: garage
+    name: "${friendly_name}"
+    lambda: "return id(contact).state ? COVER_OPEN : COVER_CLOSED;"
+    open_action:
+      - switch.turn_on: relay
+    stop_action:
+      - switch.turn_on: relay
+    close_action:
+      - switch.turn_on: relay
+
+text_sensor:
+  - platform: wifi_info
+    ip_address:
+      name: "${friendly_name} IP Address"
+      disabled_by_default: true
