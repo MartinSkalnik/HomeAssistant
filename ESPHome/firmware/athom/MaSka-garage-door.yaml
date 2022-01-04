@@ -1,7 +1,7 @@
 substitutions:
-  name: "athom-garage-door"
-  friendly_name: "Athom Garage Door"
-  project_name: "athom.garage-door"
+  name: "MaSka-garage-door"
+  friendly_name: "MaSka Garage Door"
+  project_name: "MaSka.Garage-Door"
   project_version: "1.0"
 
 esphome:
@@ -28,7 +28,7 @@ wifi:
 captive_portal:
 
 dashboard_import:
-  package_import_url: github://athom-tech/athom-configs/athom-garage-door.yaml
+  package_import_url: github://MartinSkalnik/HomeAssistant/ESPHome/firmware/athom/MaSka-garage-door.yaml
 
 sensor:
   - platform: uptime
