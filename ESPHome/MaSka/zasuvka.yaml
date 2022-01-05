@@ -32,14 +32,14 @@ dashboard_import:
 
 binary_sensor:
   - platform: status
-    name: "${friendly_name} Stav"
+    name: "${friendly_name} - Stav"
 
   - platform: gpio
     pin:
       number: 3
       mode: INPUT_PULLUP
       inverted: true
-    name: "${friendly_name} Tlačítko Napájení"
+    name: "${friendly_name} - Tlačítko Napájení"
     disabled_by_default: true
     on_multi_click:
       - timing:
@@ -54,7 +54,7 @@ binary_sensor:
 
 sensor:
   - platform: uptime
-    name: "${friendly_name} Doba provozu"
+    name: "${friendly_name} - Doba provozu"
 
   - platform: hlw8012
     sel_pin:
@@ -64,7 +64,7 @@ sensor:
     cf1_pin: GPIO5
     voltage_divider: 780
     current:
-      name: "${friendly_name} Proud"
+      name: "${friendly_name} - Proud"
       filters:
           - calibrate_linear:
             - 0.0000 -> 0.0110 # Bez zátěže, relé vypnuto
@@ -78,10 +78,10 @@ sensor:
           # Normalizování pro zatížení zásuvky
           - lambda: if (x < 0.0260) return 0; else return (x - 0.0260);
     voltage:
-      name: "${friendly_name} Napětí"
+      name: "${friendly_name} - Napětí"
 
     power:
-      name: "${friendly_name} Příkon"
+      name: "${friendly_name} - Příkon"
       id: socket_my_power
       unit_of_measurement: W
       filters:
@@ -100,7 +100,7 @@ sensor:
     update_interval: 5s
 
   - platform: total_daily_energy
-    name: "${friendly_name} Denní spotřeba"
+    name: "${friendly_name} - Denní spotřeba"
     power_id: socket_my_power
     unit_of_measurement: kWh
     accuracy_decimals: 3
@@ -110,7 +110,7 @@ sensor:
 switch:
   - platform: restart
     id: restart_switch
-    name: "${friendly_name} Restart"
+    name: "${friendly_name} - Restart"
 
   - platform: gpio
     name: "${friendly_name}"
@@ -125,7 +125,7 @@ switch:
 
 light:
   - platform: status_led
-    name: "${friendly_name} Status LED"
+    name: "${friendly_name} - Status LED"
     id: blue_led
     disabled_by_default: true
     pin:
@@ -138,5 +138,5 @@ time:
 text_sensor:
   - platform: wifi_info
     ip_address:
-      name: "${friendly_name} IP Adresa"
+      name: "${friendly_name} - IP Adresa"
       disabled_by_default: true
