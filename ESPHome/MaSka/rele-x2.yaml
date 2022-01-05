@@ -1,7 +1,7 @@
 substitutions:
   name: "rele-x2"
   friendly_name: "Deska relé x2"
-  project_name: "rele-x2"
+  project_name: "MartinSkalník.Relé-x2"
   project_version: "1.0"
 
 esphome:
