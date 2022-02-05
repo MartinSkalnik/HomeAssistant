@@ -1,0 +1,146 @@
+#
+# WiFi teploměr a vlhkoměr
+#
+substitutions:
+  device_description: "Měří teplotu a vlhkost pomocí čidla DHT a odesílá data na server TMEP.cz"
+  device_name: teplomer             # <-- Jméno zařízení v ESPHome
+  friendly_name: Teploměr           # <-- Jméno pro prezentaci senzorů v HomeAssistant
+  esp_platform: ESP8266             # <-- Platforma ESP (ESP8266, ESP32)
+  esp_board: d1_mini                # <-- Typ použité desky (d1_mini, esp01_1m, esp07, esp12, nodemcuv2, nodemcu-32s, esp8285, ...)
+  status_led: GPIO2                 # <-- Pin na který je připojená stavová LED (LED_BUILTIN na modulech ESP je většinou vyvedena na GPIO2)
+  sensor_pin: GPIO0                 # <-- Pin na který je připojen senzor
+  sensor_type: DHT22                # <-- Typ použitého senzoru (AUTO_DETECT, DHT11, DHT22, DHT22_TYPE2, AM2302, RHT03, SI7021)
+  tmep_domain: "DOMENA.tmep.cz"     # <-- Doména měření na serveru TMEP
+  tmep_guid_1: "tempV"              # <-- GUID měření teploty
+  tmep_guid_2: "humV"               # <-- GUID měření vlhkosti
+  tmep_update: "1min"               # <-- Interval odesílání měření na server (30sec, 1min, ...)
+
+esphome:
+  name: '${device_name}'
+  comment: '${device_description}'
+  name_add_mac_suffix: false
+  project:
+    name: "MaSka.Teplomer_DHT"
+    version: "1.1.0"
+  platform: '${esp_platform}'
+  board: '${esp_board}'
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+  # Zapne FallBack HotSpot pokud nedojde ke spojení s AP
+  ap:
+    ssid: '${device_name}'
+    password: !secret fallback_password
+
+captive_portal:
+
+# LOGování
+logger:
+  level: DEBUG
+
+# HomeAssistant API
+api:
+  password: !secret api_password
+  encryption:
+    key: !secret encrypt_key
+
+# OTA update
+ota:
+  password: !secret ota_password
+  safe_mode: true
+  reboot_timeout: 10min
+  num_attempts: 5
+
+# WEB server
+web_server:
+  port: 80
+  auth:
+    username: !secret web_user
+    password: !secret web_password
+
+# Status LED
+status_led:
+  pin:
+    number: ${status_led}
+
+# Tlačítko RESTART
+button:
+  - platform: restart
+    name: "${friendly_name} Restart"
+    icon: mdi:restart
+
+# Senzory ...
+text_sensor:
+# ESPHome
+  - platform: version
+    hide_timestamp: true
+    name: "${friendly_name} Verze ESPHome"
+    icon: mdi:information
+    disabled_by_default: true
+# WiFi
+  - platform: wifi_info
+    ip_address:
+      name: "${friendly_name} IP Adresa"
+      icon: mdi:ip-network
+      disabled_by_default: true
+    mac_address:
+      name: "${friendly_name} MAC adresa"
+      icon: mdi:expansion-card-variant
+      disabled_by_default: true
+    ssid:
+      name: "${friendly_name} Připojeno k SSID"
+      icon: mdi:wifi-check
+      disabled_by_default: true
+    
+# Další senzory ...
+sensor:
+# WiFi Signál
+  - platform: wifi_signal
+    name: "${friendly_name} WiFi Signál"
+    icon: mdi:wifi
+    update_interval: 60s
+    disabled_by_default: true
+  
+# Měření teploty a vlhkosti
+  - platform: dht
+    pin: ${sensor_pin}
+    model: ${sensor_type}
+    update_interval: 10s
+    temperature:
+      name: "${friendly_name} Teplota"
+      unit_of_measurement: "°C"
+      device_class: temperature
+      state_class: measurement
+      icon: mdi:thermometer
+      accuracy_decimals: 1
+      id: temperature
+    humidity:
+      name: "${friendly_name} Vlhkost"
+      unit_of_measurement: "%"
+      device_class: humidity
+      state_class: measurement
+      icon: mdi:water-percent
+      accuracy_decimals: 0
+      id: humidity
+  
+# Odeslání měření na server
+http_request:
+  useragent: esphome/device
+  timeout: 10s
+interval:
+  - interval: ${tmep_update}
+    then:
+      - http_request.get:
+          url: !lambda |-
+            char buffer[256];
+            sprintf(buffer, "http://${tmep_domain}/?${tmep_guid_1}=%.2f&${tmep_guid_2}=%.2f", id(temperature).state, id(humidity).state);
+            return ((std::string) buffer).c_str();
+          verify_ssl: false
+          on_response:
+            then:
+              - logger.log:
+                  format: "Stav odpovědi od serveru TMEP: %d"
+                  args:
+                    status_code
